@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Catbox Uploader</title>
+  <style>
+    body { font-family: Arial; padding: 20px; }
+    input, button { margin-top: 10px; }
+    #status { margin-top: 15px; font-weight: bold; }
+  </style>
+</head>
+<body>
+  <h2>📤 Upload to Catbox</h2>
+  <input type="file" id="fileInput" />
+  <button onclick="uploadFile()">Upload</button>
+  <p id="status"></p>
+  <a id="url" target="_blank"></a>
+
+  <script>
+    async function uploadFile() {
+      const file = document.getElementById('fileInput').files[0];
+      if (!file) return alert('Select a file first');
+
+      const formData = new FormData();
+      formData.append('file', file);
+
+      document.getElementById('status').innerText = 'Uploading...';
+
+      try {
+        const res = await fetch('/upload', { method: 'POST', body: formData });
+        const data = await res.json();
+        if (data.url) {
+          document.getElementById('status').innerText = '✅ Success!';
+          document.getElementById('url').innerText = data.url;
+          document.getElementById('url').href = data.url;
+        } else {
+          throw new Error(data.error);
+        }
+      } catch (err) {
+        console.error(err);
+        document.getElementById('status').innerText = '❌ Upload failed';
+      }
+    }
+  </script>
+</body>
+</html>
